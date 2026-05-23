@@ -1,0 +1,9 @@
+sku_id,product_name,platform,competitor_url,competitor_price,currency,last_checked_at
+SHOE001,Nike Blue Running Shoes,Amazon,https://amazon.in/dp/SHOE001,3499,INR,2026-05-23
+SHOE001,Nike Blue Running Shoes,Myntra,https://myntra.com/p/SHOE001,3799,INR,2026-05-23
+SHOE001,Nike Blue Running Shoes,Ajio,https://ajio.com/p/SHOE001,3650,INR,2026-05-23
+DRESS001,Red Floral Dress,Ajio,https://ajio.com/p/DRESS001,1599,INR,2026-05-23
+DRESS001,Red Floral Dress,Meesho,https://meesho.com/p/DRESS001,1699,INR,2026-05-23
+TSHIRT001,Men Cotton Casual T-Shirt,Amazon,https://amazon.in/dp/TSHIRT001,549,INR,2026-05-23
+TSHIRT001,Men Cotton Casual T-Shirt,Myntra,https://myntra.com/p/TSHIRT001,579,INR,2026-05-23
+WATCH001,Casio Digital Sports Watch,Amazon,https://amazon.in/dp/WATCH001,1999,INR,2026-05-23

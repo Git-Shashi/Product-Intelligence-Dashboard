@@ -1,0 +1,6 @@
+sku_id,product_title,description,brand,category,price,mrp,image_url,product_url,availability,color,size,material
+SHOE001,Nike Blue Running Shoes,Lightweight Nike running shoes with breathable mesh upper and cushioned sole. Great for daily runs.,Nike,Shoes,3999,4999,https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400,https://flipkart.com/p/SHOE001,in_stock,Blue,UK 9,Mesh
+DRESS001,Red Floral Dress,Elegant red floral dress from Zara. Lightweight cotton fabric perfect for parties and casual outings.,Zara,Dresses,1799,2499,https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400,https://flipkart.com/p/DRESS001,in_stock,Red,M,Cotton
+BAG001,,,,Bags,abc,1299,,,out_of_stock,,,
+TSHIRT001,Men Cotton Casual T-Shirt,Comfortable everyday cotton t-shirt for men. Soft fabric breathable and machine washable.,H&M,Apparel,599,799,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400,https://flipkart.com/p/TSHIRT001,in_stock,Navy Blue,L,100% Cotton
+WATCH001,Casio Digital Sports Watch,Casio digital watch with stopwatch alarm and water resistance up to 50m. Durable resin case and strap.,Casio,Electronics,2200,2200,https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400,https://flipkart.com/p/WATCH001,in_stock,Black,One Size,Resin
