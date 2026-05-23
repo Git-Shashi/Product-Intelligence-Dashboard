@@ -138,6 +138,8 @@ export const api = {
   // Alerts
   listAlerts: (params?: { severity?: string; status?: string }) =>
     apiClient.get<Alert[]>("/alerts", { params }).then((r) => r.data),
+  alertCount: () => apiClient.get<{ open: number }>("/alerts/count").then((r) => r.data),
   acknowledgeAlert: (id: number) =>
     apiClient.patch<Alert>(`/alerts/${id}/acknowledge`).then((r) => r.data),
+  acknowledgeAllAlerts: () => apiClient.post("/alerts/acknowledge-all").then((r) => r.data),
 };

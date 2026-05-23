@@ -22,12 +22,36 @@ export function AlertsPage() {
 
   const ackMutation = useMutation({
     mutationFn: (id: number) => api.acknowledgeAlert(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["alerts"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["alerts"] });
+      qc.invalidateQueries({ queryKey: ["alert-count"] });
+    },
   });
+
+  const ackAllMutation = useMutation({
+    mutationFn: api.acknowledgeAllAlerts,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["alerts"] });
+      qc.invalidateQueries({ queryKey: ["alert-count"] });
+    },
+  });
+
+  const openCount = alerts.filter((a) => a.status === "OPEN").length;
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Alerts</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Alerts</h1>
+        {openCount > 0 && (
+          <button
+            onClick={() => ackAllMutation.mutate()}
+            disabled={ackAllMutation.isPending}
+            className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50"
+          >
+            Mark All Read
+          </button>
+        )}
+      </div>
 
       <div className="flex gap-3">
         <select value={severityFilter} onChange={(e) => setSeverityFilter(e.target.value)}

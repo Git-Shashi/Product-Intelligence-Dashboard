@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { api } from "@/api";
 
 const NAV = [
   { to: "/upload", label: "Upload" },
@@ -11,6 +13,12 @@ const NAV = [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
+  const { data: countData } = useQuery({
+    queryKey: ["alert-count"],
+    queryFn: api.alertCount,
+    refetchInterval: 15000,
+  });
+  const openCount = countData?.open ?? 0;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -25,13 +33,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
               key={to}
               to={to}
               className={cn(
-                "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+                "px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5",
                 pathname.startsWith(to)
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-gray-100"
               )}
             >
               {label}
+              {label === "Alerts" && openCount > 0 && (
+                <span className="inline-flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold min-w-[16px] h-4 px-1 leading-none">
+                  {openCount > 99 ? "99+" : openCount}
+                </span>
+              )}
             </Link>
           ))}
         </nav>

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
@@ -26,6 +26,23 @@ async def list_alerts(
         st = AlertStatus(status.upper())
         alerts = [a for a in alerts if a.status == st]
     return alerts
+
+
+@router.get("/count")
+async def alert_count(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(
+        select(func.count()).where(Alert.status == AlertStatus.OPEN)
+    )
+    return {"open": result.scalar_one()}
+
+
+@router.post("/acknowledge-all")
+async def acknowledge_all(db: AsyncSession = Depends(get_db)):
+    await db.execute(
+        update(Alert).where(Alert.status == AlertStatus.OPEN).values(status=AlertStatus.ACKNOWLEDGED)
+    )
+    await db.commit()
+    return {"ok": True}
 
 
 @router.patch("/{alert_id}/acknowledge", response_model=AlertOut)

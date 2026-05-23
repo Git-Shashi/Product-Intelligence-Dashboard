@@ -121,17 +121,18 @@ async def process_product_row(
 
     product.quality_score = compute_quality_score([sev for _, sev, _, _ in issues])
 
-    # Raise alerts for HIGH issues on new products
-    if is_new:
-        for issue_type, severity, message, _ in issues:
-            if severity == Severity.HIGH:
-                db.add(Alert(
-                    product_id=product.id,
-                    type=issue_type,
-                    severity=severity,
-                    message=f"[{sku_id}] {message}",
-                    status=AlertStatus.OPEN,
-                ))
+    # Raise alerts for all issue severities on new products
+    # On re-validation (edit/re-upload), only raise new HIGH alerts to avoid noise
+    alert_severities = {Severity.HIGH, Severity.MEDIUM, Severity.LOW} if is_new else {Severity.HIGH}
+    for issue_type, severity, message, _ in issues:
+        if severity in alert_severities:
+            db.add(Alert(
+                product_id=product.id,
+                type=issue_type,
+                severity=severity,
+                message=f"[{sku_id}] {message}",
+                status=AlertStatus.OPEN,
+            ))
 
     await db.commit()
     existing_skus.add(sku_id)
