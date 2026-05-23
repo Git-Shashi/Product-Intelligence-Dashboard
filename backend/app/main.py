@@ -4,7 +4,11 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes.alerts import router as alerts_router
+from app.api.routes.dashboard import router as dashboard_router
 from app.api.routes.health import router as health_router
+from app.api.routes.jobs import router as jobs_router
+from app.api.routes.products import router as products_router
 from app.core.config import settings
 
 logging.basicConfig(level=logging.INFO)
@@ -27,3 +31,7 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+app.include_router(jobs_router)
+app.include_router(dashboard_router)
+app.include_router(alerts_router)
+app.include_router(products_router)
