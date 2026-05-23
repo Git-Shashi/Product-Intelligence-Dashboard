@@ -9,6 +9,8 @@ from app.api.routes.dashboard import router as dashboard_router
 from app.api.routes.health import router as health_router
 from app.api.routes.jobs import router as jobs_router
 from app.api.routes.products import router as products_router
+from app.api.routes.competitor import router as competitor_router
+from app.api.routes.competitor import products_router as competitor_products_router
 from app.api.routes.video import router as video_router
 from app.core.config import settings
 
@@ -36,4 +38,6 @@ app.include_router(jobs_router)
 app.include_router(dashboard_router)
 app.include_router(alerts_router)
 app.include_router(products_router)
+app.include_router(competitor_router)
+app.include_router(competitor_products_router)
 app.include_router(video_router)
