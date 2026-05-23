@@ -29,6 +29,20 @@ export function ProductDetailPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["product", sku] }),
   });
 
+  const { data: comparison } = useQuery({
+    queryKey: ["competitor-prices", sku],
+    queryFn: () => api.getCompetitorPrices(sku!),
+    enabled: !!sku,
+  });
+
+  const refreshMutation = useMutation({
+    mutationFn: api.refreshPrices,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["competitor-prices", sku] });
+      qc.invalidateQueries({ queryKey: ["alerts"] });
+    },
+  });
+
   if (isLoading) return <p className="text-muted-foreground">Loading…</p>;
   if (!product) return <p className="text-destructive">Product not found.</p>;
 
@@ -200,11 +214,105 @@ export function ProductDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Competitor Prices — Slice 4 */}
-      <Card className="opacity-60">
-        <CardHeader><CardTitle>Competitor Prices <span className="text-xs font-normal text-muted-foreground ml-1">(coming in next build)</span></CardTitle></CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">Competitor price comparison will be available after Slice 4.</p>
+      {/* Competitor Prices */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Competitor Prices</CardTitle>
+          <button
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshMutation.isPending}
+            className="text-xs px-3 py-1.5 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/80 disabled:opacity-50"
+          >
+            {refreshMutation.isPending ? "Refreshing…" : "↻ Refresh Prices"}
+          </button>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {comparison?.competitors && comparison.competitors.length > 0 ? (
+            <>
+              {/* Comparison summary */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { label: "Our Price", value: comparison.our_price },
+                  { label: "Lowest", value: comparison.lowest_competitor },
+                  { label: "Highest", value: comparison.highest_competitor },
+                  { label: "Average", value: comparison.average_competitor },
+                ].map(({ label, value }) => (
+                  <div key={label} className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                    <p className="text-lg font-semibold mt-0.5">
+                      {value != null ? `₹${value.toLocaleString()}` : "—"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Price gap + recommended action */}
+              {comparison.percentage_diff != null && (
+                <div className={`rounded-lg p-3 text-sm border ${
+                  comparison.percentage_diff > 10
+                    ? "bg-red-50 border-red-200 text-red-700"
+                    : comparison.percentage_diff > 0
+                    ? "bg-yellow-50 border-yellow-200 text-yellow-700"
+                    : "bg-green-50 border-green-200 text-green-700"
+                }`}>
+                  <span className="font-medium">
+                    {comparison.percentage_diff > 0 ? `+${comparison.percentage_diff}%` : `${comparison.percentage_diff}%`} vs lowest competitor
+                  </span>
+                  <span className="mx-2">·</span>
+                  {comparison.recommended_action}
+                </div>
+              )}
+
+              {/* Competitor table */}
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left border-b border-border">
+                    <th className="pb-2 font-medium text-muted-foreground text-xs uppercase">Platform</th>
+                    <th className="pb-2 font-medium text-muted-foreground text-xs uppercase">Price</th>
+                    <th className="pb-2 font-medium text-muted-foreground text-xs uppercase">vs Ours</th>
+                    <th className="pb-2 font-medium text-muted-foreground text-xs uppercase">Link</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparison.competitors.map((c) => {
+                    const diff = comparison.our_price != null
+                      ? ((comparison.our_price - c.competitor_price) / c.competitor_price * 100)
+                      : null;
+                    return (
+                      <tr key={c.id} className="border-b border-border last:border-0">
+                        <td className="py-2 font-medium">{c.platform}</td>
+                        <td className="py-2">₹{c.competitor_price.toLocaleString()}</td>
+                        <td className="py-2">
+                          {diff != null && (
+                            <span className={diff > 0 ? "text-red-600" : "text-green-600"}>
+                              {diff > 0 ? `+${diff.toFixed(1)}%` : `${diff.toFixed(1)}%`}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2">
+                          {c.competitor_url ? (
+                            <a href={c.competitor_url} target="_blank" rel="noopener noreferrer"
+                              className="text-primary text-xs hover:underline">View →</a>
+                          ) : "—"}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-sm text-muted-foreground mb-3">No competitor prices yet.</p>
+              <button
+                onClick={() => refreshMutation.mutate()}
+                disabled={refreshMutation.isPending}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium disabled:opacity-50"
+              >
+                {refreshMutation.isPending ? "Loading…" : "Fetch Competitor Prices"}
+              </button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

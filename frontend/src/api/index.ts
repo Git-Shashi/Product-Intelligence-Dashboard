@@ -87,6 +87,17 @@ export interface Alert {
   created_at: string;
 }
 
+export interface PriceComparison {
+  our_price: number | null;
+  lowest_competitor: number | null;
+  highest_competitor: number | null;
+  average_competitor: number | null;
+  price_gap: number | null;
+  percentage_diff: number | null;
+  recommended_action: string;
+  competitors: CompetitorPrice[];
+}
+
 export const api = {
   health: () => apiClient.get("/health").then((r) => r.data),
 
@@ -112,6 +123,17 @@ export const api = {
 
   // Dashboard
   qualitySummary: () => apiClient.get<QualitySummary>("/dashboard/quality-summary").then((r) => r.data),
+
+  // Competitor prices
+  getCompetitorPrices: (sku: string) =>
+    apiClient.get<PriceComparison>(`/products/${sku}/competitor-prices`).then((r) => r.data),
+  uploadCompetitorCsv: (file: File) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    return apiClient.post<{ inserted: number; skipped: number }>("/competitor-prices/upload", fd).then((r) => r.data);
+  },
+  refreshPrices: () =>
+    apiClient.post<{ job_id: number }>("/competitor-prices/refresh").then((r) => r.data),
 
   // Alerts
   listAlerts: (params?: { severity?: string; status?: string }) =>

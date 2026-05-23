@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "@/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,17 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
 }
 
 export function DashboardPage() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["quality-summary"], queryFn: api.qualitySummary });
+
+  const refreshMutation = useMutation({
+    mutationFn: api.refreshPrices,
+    onSuccess: (result) => {
+      qc.invalidateQueries({ queryKey: ["alerts"] });
+      navigate(`/jobs/${result.job_id}`);
+    },
+  });
 
   if (isLoading) return <p className="text-muted-foreground">Loading dashboard…</p>;
   if (!data) return null;
@@ -26,9 +36,18 @@ export function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Quality Dashboard</h1>
-        <Link to="/upload" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90">
-          + Upload
-        </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshMutation.isPending}
+            className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg text-sm font-medium hover:bg-secondary/80 disabled:opacity-50"
+          >
+            {refreshMutation.isPending ? "Refreshing…" : "↻ Refresh Prices"}
+          </button>
+          <Link to="/upload" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90">
+            + Upload
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
