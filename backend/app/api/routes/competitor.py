@@ -128,7 +128,7 @@ async def _run_refresh_job(job_id: int) -> None:
             alerts_raised = 0
 
             for i, product in enumerate(products):
-                price_data = service.get_prices(product.sku_id, product.price)
+                price_data = service.get_prices(product.sku_id, product.price, product.product_title or "")
                 new_alerts = await _upsert_competitor_prices(db, product, price_data, check_drops=True)
                 alerts_raised += len(new_alerts)
                 await _raise_price_alert_if_needed(db, product)

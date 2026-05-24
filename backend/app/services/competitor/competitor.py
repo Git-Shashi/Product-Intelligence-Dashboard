@@ -12,5 +12,5 @@ class CompetitorPriceData:
 
 @runtime_checkable
 class CompetitorService(Protocol):
-    def get_prices(self, sku_id: str, our_price: float | None) -> list[CompetitorPriceData]:
+    def get_prices(self, sku_id: str, our_price: float | None, product_title: str = "") -> list[CompetitorPriceData]:
         ...
