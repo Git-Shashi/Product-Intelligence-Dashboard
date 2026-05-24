@@ -6,6 +6,8 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/product_dashboard"
     cors_origin: str = "http://localhost:5173"
+    # Comma-separated extra origins (e.g. Vercel preview URLs)
+    cors_extra_origins: str = ""
     extraction_provider: str = "ocr"  # "ocr" | "mock"
 
     # Optional SMTP — no-op if unset
